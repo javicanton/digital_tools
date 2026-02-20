@@ -1,12 +1,42 @@
 import { Link } from 'react-router-dom';
 import { UI_TEXT } from '../i18n/es';
 
+function getLogoFallback(officialUrl) {
+  try {
+    const hostname = new URL(officialUrl).hostname;
+    return `https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(hostname)}`;
+  } catch {
+    return '';
+  }
+}
+
+function getPlaceholderSvg(label) {
+  const safeLabel = String(label || 'Herramienta').slice(0, 36);
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0%' stop-color='#0e6d6b'/><stop offset='100%' stop-color='#f18f01'/></linearGradient></defs><rect width='1200' height='675' fill='url(#g)'/><text x='50%' y='52%' text-anchor='middle' fill='#ffffff' font-size='56' font-family='Manrope, Arial, sans-serif'>${safeLabel}</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 export default function ToolCard({ tool }) {
   const shortTags = tool.etiquetas_lista.slice(0, 3);
   const shortFeatures = tool.funcionalidades_lista.slice(0, 2);
+  const imageSrc = tool.imagen_url || getLogoFallback(tool.url_oficial) || getPlaceholderSvg(tool.nombre);
 
   return (
     <article className="tool-card">
+      <div className="tool-media">
+        <img
+          src={imageSrc}
+          alt={`Imagen de ${tool.nombre}`}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = getPlaceholderSvg(tool.nombre);
+          }}
+        />
+      </div>
+
       <header>
         <p className="tool-category">{tool.categoria_principal}</p>
         <h3>

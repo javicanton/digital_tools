@@ -16,7 +16,10 @@ Motivo breve:
 .
 ├── .github/workflows/deploy-pages.yml
 ├── public/
-│   └── data/tools.json
+│   ├── data/
+│   │   ├── tool-images.json
+│   │   └── tools.json
+│   └── sw.js
 ├── data/
 │   └── tools.template.csv
 ├── scripts/
@@ -72,6 +75,8 @@ Cada herramienta debe contener **exactamente** estos campos:
 
 Incluye un ejemplo realista con **10 herramientas ficticias** en `public/data/tools.json`.
 
+Para imagenes de tarjetas, el catalogo usa `public/data/tool-images.json` (mapa `tool_id -> URL externa`).
+
 ## Actualizar datos desde CSV o JSON
 
 1. Prepara tu archivo CSV con las cabeceras exactas (puedes partir de `data/tools.template.csv`).
@@ -125,10 +130,24 @@ Reglas para etiquetas:
 - Filtro por `categoria_principal`.
 - Filtro multi-seleccion por `etiquetas`.
 - Orden por relevancia textual, nombre, precio/modelo y curva de aprendizaje.
-- Tarjetas responsive con nombre, categoria, 3 etiquetas, precio, curva y 1-2 funcionalidades.
+- Tarjetas responsive con imagen, nombre, categoria, 3 etiquetas, precio, curva y 1-2 funcionalidades.
+- Parrilla de 3 tarjetas por fila en escritorio, 2 en tablet y 1 en movil.
 - Ficha individual en `/tool/{tool_id}` con obligatorias primero, recomendadas despues y opcionales en bloque colapsable.
 - Modo claro/oscuro.
 - Accesibilidad base: estructura semantica, labels, foco visible y navegacion por teclado.
+
+## Cache temporal de imagenes externas
+
+El proyecto registra un `service worker` (`public/sw.js`) en produccion para cachear imagenes externas de las tarjetas en el navegador.
+
+Esto permite:
+- reducir recargas de imagenes ya vistas,
+- mejorar rendimiento percibido,
+- mantener un almacenamiento temporal en cliente sin backend.
+
+Importante:
+- el cache depende del navegador del usuario (no es persistencia en servidor),
+- si una URL externa cambia o cae, la tarjeta usa fallback visual.
 
 ## Formulario de inclusion de nuevas herramientas
 

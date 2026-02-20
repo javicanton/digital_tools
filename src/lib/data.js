@@ -3,7 +3,7 @@ import { splitList, toPlainLower } from './normalize';
 
 let toolsCache = null;
 
-function normalizeTool(rawTool) {
+function normalizeTool(rawTool, imageMap) {
   const tool = REQUIRED_FIELDS.reduce((acc, key) => {
     const value = rawTool?.[key];
     acc[key] = typeof value === 'string' ? value.trim() : String(value ?? '').trim();
@@ -15,6 +15,8 @@ function normalizeTool(rawTool) {
 
   return {
     ...tool,
+    imagen_url:
+      typeof imageMap?.[tool.tool_id] === 'string' ? imageMap[tool.tool_id].trim() : '',
     etiquetas_lista: etiquetasLista,
     etiquetas_normalizadas: etiquetasLista.map((tag) => toPlainLower(tag)),
     funcionalidades_lista: funcionalidadesLista,
@@ -26,6 +28,26 @@ function normalizeTool(rawTool) {
 
 function validateRecord(rawTool) {
   return REQUIRED_FIELDS.every((field) => Object.prototype.hasOwnProperty.call(rawTool, field));
+}
+
+async function loadImageMap() {
+  const imageMapUrl = `${import.meta.env.BASE_URL}data/tool-images.json`;
+
+  try {
+    const response = await fetch(imageMapUrl);
+    if (!response.ok) {
+      return {};
+    }
+
+    const payload = await response.json();
+    if (!payload || Array.isArray(payload) || typeof payload !== 'object') {
+      return {};
+    }
+
+    return payload;
+  } catch {
+    return {};
+  }
 }
 
 export async function loadTools() {
@@ -50,7 +72,8 @@ export async function loadTools() {
     throw new Error(`Hay ${invalidCount} registros con campos incompletos en tools.json.`);
   }
 
-  const normalized = payload.map((record) => normalizeTool(record));
+  const imageMap = await loadImageMap();
+  const normalized = payload.map((record) => normalizeTool(record, imageMap));
 
   toolsCache = normalized;
   return normalized;
