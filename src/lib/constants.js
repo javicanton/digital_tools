@@ -1,0 +1,31 @@
+export const REQUIRED_FIELDS = [
+  'tool_id',
+  'nombre',
+  'url_oficial',
+  'categoria_principal',
+  'etiquetas',
+  'descripcion_corta',
+  'funcionalidades_clave',
+  'utilidad_en_investigacion',
+  'fases_investigacion',
+  'tipos_datos',
+  'precio_modelo',
+  'coste_estimado',
+  'requisitos_sistema',
+  'integraciones',
+  'importacion',
+  'exportacion',
+  'trabajo_colaborativo',
+  'documentacion_tutoriales',
+  'idioma_interfaz',
+  'transparencia_datos',
+  'protocolos_etica',
+  'uso_IA',
+  'curva_aprendizaje',
+  'alternativas',
+  'notas_limitaciones',
+  'ultima_actualizacion_aprox',
+];
+
+export const DEFAULT_SUGGESTION_FORM_URL =
+  'https://example.com/formulario-inclusion-catalogo';

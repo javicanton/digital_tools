@@ -1,0 +1,82 @@
+export const UI_TEXT = {
+  siteTitle: 'Catalogo de Herramientas Digitales para Investigacion Social',
+  siteSubtitle:
+    'Listado abierto para explorar, comparar y ampliar herramientas usadas en metodos y tecnicas de investigacion social aplicada.',
+  skipToContent: 'Saltar al contenido principal',
+  nav: {
+    catalog: 'Catalogo',
+    request: 'Solicitar inclusion',
+  },
+  theme: {
+    toLight: 'Cambiar a modo claro',
+    toDark: 'Cambiar a modo oscuro',
+  },
+  home: {
+    title: 'Explora herramientas por fase, categoria y etiquetas',
+    description:
+      'Busca por nombre, descripcion o etiquetas, aplica filtros y abre la ficha completa para decidir con criterio metodologico.',
+    statsLabel: 'herramientas visibles',
+    empty: 'No hay resultados con los filtros actuales.',
+    loading: 'Cargando herramientas...',
+    error: 'No se pudo cargar el dataset. Revisa public/data/tools.json.',
+  },
+  filters: {
+    searchLabel: 'Buscar',
+    searchPlaceholder: 'Ejemplo: transcripcion automatica, encuesta, etnografia',
+    categoryLabel: 'Categoria principal',
+    categoryAll: 'Todas las categorias',
+    tagsLabel: 'Etiquetas (multi-seleccion)',
+    sortLabel: 'Ordenar por',
+    sortOptions: {
+      relevance: 'Relevancia (texto)',
+      name: 'Nombre (A-Z)',
+      price: 'Precio / modelo',
+      learningCurve: 'Curva de aprendizaje',
+    },
+    clear: 'Limpiar filtros',
+  },
+  card: {
+    keyFeatures: 'Funcionalidades clave',
+    viewDetail: 'Ver ficha',
+    officialSite: 'Web oficial',
+  },
+  detail: {
+    back: 'Volver al catalogo',
+    quickSummary: 'Resumen rapido',
+    keyFeatures: 'Funcionalidades clave',
+    price: 'Precio / modelo de licencia',
+    requirements: 'Requisitos del sistema',
+    privacy: 'Transparencia sobre almacenamiento y uso de datos',
+    versatility: 'Versatilidad por fases de investigacion',
+    integrations: 'Integracion con otras herramientas',
+    docs: 'Documentacion y tutoriales',
+    collaboration: 'Trabajo colaborativo',
+    importExport: 'Importacion / exportacion',
+    aiUsage: 'Uso de IA',
+    optional: 'Ver mas informacion',
+    ethics: 'Protocolos de etica',
+    language: 'Idioma de interfaz',
+    alternatives: 'Alternativas',
+    limitations: 'Notas y limitaciones',
+    updated: 'Ultima actualizacion aproximada',
+    researchUse: 'Utilidad en investigacion',
+    dataTypes: 'Tipos de datos compatibles',
+    costEstimate: 'Coste estimado',
+    notFoundTitle: 'Herramienta no encontrada',
+    notFoundBody: 'No existe una ficha con ese tool_id en el dataset actual.',
+  },
+  request: {
+    title: 'Solicitar inclusion de una nueva herramienta',
+    body:
+      'Puedes proponer herramientas para el catalogo mediante un formulario externo. El equipo docente revisa cada propuesta antes de publicarla.',
+    openForm: 'Abrir formulario de solicitud',
+    fallbackTitle: 'Si aun no tienes formulario externo',
+    fallbackBody:
+      'Configura la variable VITE_SUGGESTION_FORM_URL para conectar un formulario (Google Forms, Typeform, etc.) sin cambiar codigo.',
+  },
+  notFound: {
+    title: 'Pagina no encontrada',
+    body: 'La ruta solicitada no existe en este catalogo.',
+    back: 'Volver al inicio',
+  },
+};
