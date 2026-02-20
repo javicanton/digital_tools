@@ -97,34 +97,40 @@ export default function HomePage() {
         </div>
       </section>
 
-      <SearchFilters
-        query={query}
-        onQueryChange={setQuery}
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        categories={categories}
-        selectedTags={selectedTags}
-        onToggleTag={handleToggleTag}
-        onClear={clearFilters}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-        availableTags={availableTags}
-      />
+      <div className="catalog-layout">
+        <section className="catalog-content" aria-label="Resultados del catalogo">
+          {loading && <p className="status-message">{UI_TEXT.home.loading}</p>}
+          {!loading && error && <p className="status-message status-error">{UI_TEXT.home.error}</p>}
 
-      {loading && <p className="status-message">{UI_TEXT.home.loading}</p>}
-      {!loading && error && <p className="status-message status-error">{UI_TEXT.home.error}</p>}
+          {!loading && !error && visibleTools.length === 0 && (
+            <p className="status-message">{UI_TEXT.home.empty}</p>
+          )}
 
-      {!loading && !error && visibleTools.length === 0 && (
-        <p className="status-message">{UI_TEXT.home.empty}</p>
-      )}
-
-      {!loading && !error && visibleTools.length > 0 && (
-        <section className="tools-grid" aria-label="Listado de herramientas">
-          {visibleTools.map((tool) => (
-            <ToolCard key={tool.tool_id} tool={tool} />
-          ))}
+          {!loading && !error && visibleTools.length > 0 && (
+            <section className="tools-grid" aria-label="Listado de herramientas">
+              {visibleTools.map((tool) => (
+                <ToolCard key={tool.tool_id} tool={tool} />
+              ))}
+            </section>
+          )}
         </section>
-      )}
+
+        <aside className="catalog-sidebar" aria-label="Menu lateral de filtros">
+          <SearchFilters
+            query={query}
+            onQueryChange={setQuery}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            categories={categories}
+            selectedTags={selectedTags}
+            onToggleTag={handleToggleTag}
+            onClear={clearFilters}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            availableTags={availableTags}
+          />
+        </aside>
+      </div>
     </>
   );
 }

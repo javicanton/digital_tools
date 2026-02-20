@@ -130,6 +130,7 @@ Reglas para etiquetas:
 - Filtro por `categoria_principal`.
 - Filtro multi-seleccion por `etiquetas`.
 - Orden por relevancia textual, nombre, precio/modelo y curva de aprendizaje.
+- Menu lateral de filtros a la derecha en escritorio, con posicion sticky durante el scroll.
 - Tarjetas responsive con imagen, nombre, categoria, 3 etiquetas, precio, curva y 1-2 funcionalidades.
 - Parrilla de 3 tarjetas por fila en escritorio, 2 en tablet y 1 en movil.
 - Ficha individual en `/tool/{tool_id}` con obligatorias primero, recomendadas despues y opcionales en bloque colapsable.
