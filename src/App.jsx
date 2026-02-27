@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { NavLink, Route, Routes } from 'react-router-dom';
+import { VisibleToolsCountContext } from './context/VisibleToolsCount';
 import HomePage from './pages/HomePage';
 import ToolDetailPage from './pages/ToolDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -19,6 +20,7 @@ function getInitialTheme() {
 
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
+  const { visibleCount } = useContext(VisibleToolsCountContext);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -42,6 +44,11 @@ export default function App() {
             <p className="badge">Repositorio docente</p>
             <h1>{UI_TEXT.siteTitle}</h1>
             <p>{UI_TEXT.siteSubtitle}</p>
+            {visibleCount !== null && (
+              <p className="header-tools-count" aria-live="polite">
+                <strong>{visibleCount}</strong> {UI_TEXT.home.statsLabel}
+              </p>
+            )}
           </div>
 
           <div className="header-actions">

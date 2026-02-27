@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import SearchFilters from '../components/SearchFilters';
 import ToolCard from '../components/ToolCard';
 import { UI_TEXT } from '../i18n/es';
 import { loadTools } from '../lib/data';
 import { filterAndSortTools } from '../lib/sort';
+import { VisibleToolsCountContext } from '../context/VisibleToolsCount';
 
 export default function HomePage() {
   const [tools, setTools] = useState([]);
@@ -15,6 +16,8 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [sortBy, setSortBy] = useState('relevance');
+
+  const { setVisibleCount } = useContext(VisibleToolsCountContext);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -81,6 +84,11 @@ export default function HomePage() {
     [tools, query, selectedCategory, selectedTags, sortBy]
   );
 
+  useEffect(() => {
+    setVisibleCount(visibleTools.length);
+    return () => setVisibleCount(null);
+  }, [visibleTools.length, setVisibleCount]);
+
   const handleToggleTag = (tag) => {
     setSelectedTags((currentTags) =>
       currentTags.includes(tag)
@@ -97,23 +105,6 @@ export default function HomePage() {
   };
 
   return (
-    <>
-      <section className="hero-panel" aria-labelledby="home-title">
-        <div>
-          <h2 id="home-title">{UI_TEXT.home.title}</h2>
-          <p>{UI_TEXT.home.description}</p>
-          <p className="result-count" aria-live="polite">
-            <strong>{visibleTools.length}</strong> {UI_TEXT.home.statsLabel}
-          </p>
-        </div>
-
-        <div className="hero-actions">
-          <Link to="/solicitar" className="primary-button">
-            {UI_TEXT.nav.request}
-          </Link>
-        </div>
-      </section>
-
       <div className="catalog-layout">
         <section className="catalog-content" aria-label="Resultados del catálogo">
           {loading && <p className="status-message">{UI_TEXT.home.loading}</p>}
@@ -157,6 +148,5 @@ export default function HomePage() {
           />
         </aside>
       </div>
-    </>
   );
 }

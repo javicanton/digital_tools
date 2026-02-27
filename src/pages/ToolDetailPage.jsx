@@ -4,6 +4,7 @@ import InfoSection from '../components/InfoSection';
 import { UI_TEXT } from '../i18n/es';
 import { loadTools } from '../lib/data';
 import { capitalizeFirst, formatSpanishNumber, parseSpanishNumber, splitList } from '../lib/normalize';
+import { getPlaceholderSvg, getToolImageUrl } from '../lib/toolImage';
 
 function renderList(items) {
   const parsed = splitList(items);
@@ -87,6 +88,18 @@ export default function ToolDetailPage() {
           {UI_TEXT.detail.back}
         </Link>
       </p>
+
+      <div className="detail-tool-media">
+        <img
+          src={getToolImageUrl(tool)}
+          alt={`Imagen de ${tool.nombre}`}
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = getPlaceholderSvg(tool.nombre);
+          }}
+        />
+      </div>
 
       <header className="detail-header">
         <div>
