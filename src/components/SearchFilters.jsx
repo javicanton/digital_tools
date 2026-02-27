@@ -29,6 +29,12 @@ export default function SearchFilters({
     <section className="filters-panel" aria-labelledby="filters-title">
       <h3 id="filters-title">Filtros y ordenación</h3>
 
+      <div className="filters-panel-actions">
+        <button type="button" className="secondary-button" onClick={onClear}>
+          {UI_TEXT.filters.clear}
+        </button>
+      </div>
+
       <form className="filters-grid" onSubmit={(event) => event.preventDefault()}>
         <div className="field-group full-width">
           <label htmlFor="search">{UI_TEXT.filters.searchLabel}</label>
@@ -115,12 +121,6 @@ export default function SearchFilters({
             </div>
           )}
         </fieldset>
-
-        <div className="field-group actions-row">
-          <button type="button" className="secondary-button" onClick={onClear}>
-            {UI_TEXT.filters.clear}
-          </button>
-        </div>
       </form>
     </section>
   );
