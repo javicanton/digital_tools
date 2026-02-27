@@ -1,0 +1,129 @@
+# Al abrir un issue con label "tool-submission", valida los datos, añade la fila a tools.csv y crea una PR.
+name: Tool submission (issue -> PR)
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  process:
+    if: contains(github.event.issue.labels.*.name, 'tool-submission')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Parse and validate issue body
+        id: parse
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          python scripts/parse_issue.py --body "$BODY" --csv data/tools.csv > parse_result.json 2>/dev/null || true
+          if python -c "import json; d=json.load(open('parse_result.json')); exit(0 if d.get('ok') else 1)" 2>/dev/null; then
+            echo "result=success" >> "$GITHUB_OUTPUT"
+          else
+            test -s parse_result.json && python -c "import json; json.load(open('parse_result.json'))" 2>/dev/null || echo '{"ok":false,"errors":["Error al parsear el cuerpo del issue."]}' > parse_result.json
+            echo "result=error" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment error and close issue
+        if: steps.parse.outputs.result == 'error'
+        run: |
+          python -c "
+          import json
+          try:
+            d = json.load(open('parse_result.json'))
+            err = chr(10).join('- ' + e for e in d.get('errors', ['Error desconocido']))
+          except Exception:
+            err = 'Error al validar los datos.'
+          open('comment_body.md', 'w').write('**Validación fallida.** No se ha creado la PR.\n\n' + err + '\n\nCorrige los datos y abre un nuevo issue con la plantilla \"Nueva herramienta\".')
+          "
+          gh issue comment "${{ github.event.issue.number }}" --body-file comment_body.md --repo "$GITHUB_REPOSITORY"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY"
+
+      - name: Create branch and add row to CSV
+        if: steps.parse.outputs.result == 'success'
+        id: branch_step
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          TIMESTAMP=$(date +%Y%m%d%H%M)
+          OUT=$(python scripts/parse_issue.py --body "$BODY" --csv data/tools.csv --output-csv data/tools_new.csv)
+          TOOL_ID=$(echo "$OUT" | python -c "import sys,json; print(json.load(sys.stdin).get('tool_id',''))")
+          BRANCH="submissions/${TOOL_ID}-${TIMESTAMP}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          mv data/tools_new.csv data/tools.csv
+          git add data/tools.csv
+          git commit -m "Añadir herramienta: $TOOL_ID"
+          git push origin "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "tool_id=$TOOL_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Create Pull Request
+        if: steps.parse.outputs.result == 'success'
+        id: pr
+        uses: actions/github-script@v7
+        env:
+          BRANCH: ${{ steps.branch_step.outputs.branch }}
+          TOOL_ID: ${{ steps.branch_step.outputs.tool_id }}
+        with:
+          script: |
+            const branch = process.env.BRANCH;
+            const toolId = process.env.TOOL_ID;
+            const pr = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Añadir herramienta: ${toolId}`,
+              head: branch,
+              base: 'main',
+              body: `## Nueva herramienta: **${toolId}**\n\n` +
+                `Generada automáticamente desde el issue #${{ github.event.issue.number }}.\n\n` +
+                `### Checklist de revisión\n` +
+                `- [ ] tool_id y url_oficial no están duplicados\n` +
+                `- [ ] Descripción y campos son correctos\n` +
+                `- [ ] tools.csv mantiene 26 columnas y formato válido\n` +
+                `- [ ] El build y el lint pasan\n\n` +
+                `Ref: #${{ github.event.issue.number }}`
+            });
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.data.number,
+              labels: ['tool-submission']
+            });
+            core.setOutput('pr_number', pr.data.number);
+            core.setOutput('pr_url', pr.data.html_url);
+
+      - name: Comment PR link and close issue
+        if: steps.parse.outputs.result == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prUrl = '${{ steps.pr.outputs.pr_url }}';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '**Validación correcta.** Se ha creado la siguiente PR:\n\n' + prUrl +
+                '\n\nRevisa el diff y haz merge cuando proceda. Tras el merge, este issue se puede cerrar.'
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });

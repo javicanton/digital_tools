@@ -574,16 +574,13 @@ main.container {
 }
 
 .detail-tool-media {
-  aspect-ratio: 16 / 9;
-  background: linear-gradient(
-    140deg,
-    color-mix(in srgb, var(--primary) 70%, #fff 30%),
-    color-mix(in srgb, var(--accent) 76%, #fff 24%)
-  );
-  border-radius: 1.1rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  flex-shrink: 0;
+  border-radius: 0.65rem;
   border: 1px solid var(--border);
   overflow: hidden;
-  box-shadow: var(--card-shadow);
+  background: var(--bg);
 }
 
 .detail-tool-media img {

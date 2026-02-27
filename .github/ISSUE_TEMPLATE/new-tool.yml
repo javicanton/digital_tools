@@ -1,0 +1,189 @@
+name: Nueva herramienta
+description: Propuesta de nueva herramienta para el catálogo (genera PR automática)
+title: "Nueva herramienta: "
+labels: ["tool-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Completa los campos siguientes. El equipo revisará la propuesta y un bot creará una PR automáticamente si los datos son válidos.
+        Campos con lista: separa con comas; se guardarán con `|` en el CSV.
+  - type: input
+    id: nombre
+    attributes:
+      label: Nombre de la herramienta
+      description: Nombre oficial tal como aparece en la web
+      placeholder: "Ej: Zotero"
+    validations:
+      required: true
+  - type: input
+    id: url_oficial
+    attributes:
+      label: URL oficial
+      description: Debe ser https:// y una URL válida
+      placeholder: "https://www.ejemplo.org"
+    validations:
+      required: true
+  - type: input
+    id: categoria_principal
+    attributes:
+      label: Categoría principal
+      description: Una categoría del catálogo (ej. revisión bibliográfica y gestión de referencias, encuestas y recogida de datos)
+      placeholder: "revisión bibliográfica y gestión de referencias"
+    validations:
+      required: true
+  - type: textarea
+    id: etiquetas
+    attributes:
+      label: Etiquetas
+      description: Lista separada por comas (se guardará con |)
+      placeholder: "referencias, citas, pdf, open source"
+    validations:
+      required: true
+  - type: textarea
+    id: descripcion_corta
+    attributes:
+      label: Descripción corta
+      description: Máximo 280 caracteres
+      placeholder: "Breve descripción de la herramienta..."
+    validations:
+      required: true
+      maxLength: 280
+  - type: textarea
+    id: funcionalidades_clave
+    attributes:
+      label: Funcionalidades clave
+      description: Lista separada por comas
+      placeholder: "captura en navegador, gestión bibliografía, anotación PDF"
+  - type: textarea
+    id: utilidad_en_investigacion
+    attributes:
+      label: Utilidad en investigación
+      description: Para qué sirve en un proyecto de investigación
+      placeholder: "Centraliza la literatura y automatiza el citado..."
+  - type: dropdown
+    id: fases_investigacion
+    attributes:
+      label: Fases de investigación
+      description: Solo valores permitidos, separados por | (diseño, recogida, limpieza, análisis, visualización, difusión)
+      options:
+        - diseño
+        - recogida
+        - limpieza
+        - análisis
+        - visualización
+        - difusión
+      multiple: true
+    validations:
+      required: true
+  - type: dropdown
+    id: tipos_datos
+    attributes:
+      label: Tipos de datos
+      description: Solo uno
+      options:
+        - cualitativo
+        - cuantitativo
+        - mixto
+    validations:
+      required: true
+  - type: dropdown
+    id: precio_modelo
+    attributes:
+      label: Precio / modelo
+      description: Solo valores permitidos
+      options:
+        - gratuita
+        - freemium
+        - pago
+        - "open source"
+        - licencia académica
+    validations:
+      required: true
+  - type: input
+    id: coste_estimado
+    attributes:
+      label: Coste estimado
+      description: Dejar vacío o NA si no se conoce
+      placeholder: "NA"
+  - type: input
+    id: requisitos_sistema
+    attributes:
+      label: Requisitos de sistema
+      description: Lista separada por comas (ej. Windows, macOS, Web)
+      placeholder: "Windows|macOS|Linux"
+  - type: textarea
+    id: integraciones
+    attributes:
+      label: Integraciones
+      description: Lista separada por comas
+      placeholder: "Word, LibreOffice, BibTeX"
+  - type: input
+    id: importacion
+    attributes:
+      label: Importación (formatos)
+      description: Lista separada por comas
+      placeholder: "RIS, BibTeX, CSV"
+  - type: input
+    id: exportacion
+    attributes:
+      label: Exportación (formatos)
+      description: Lista separada por comas
+      placeholder: "RIS, BibTeX, PDF"
+  - type: input
+    id: trabajo_colaborativo
+    attributes:
+      label: Trabajo colaborativo
+      description: Sí/no y breve detalle, o NA
+      placeholder: "sí, bibliotecas compartidas"
+  - type: input
+    id: documentacion_tutoriales
+    attributes:
+      label: Documentación / tutoriales
+      description: URL o texto
+      placeholder: "https://ejemplo.org/docs"
+  - type: input
+    id: idioma_interfaz
+    attributes:
+      label: Idioma de la interfaz
+      placeholder: "multilingüe"
+  - type: textarea
+    id: transparencia_datos
+    attributes:
+      label: Transparencia de datos
+      description: Dónde se almacenan los datos, políticas
+      placeholder: "Local por defecto; nube opcional..."
+  - type: textarea
+    id: protocolos_etica
+    attributes:
+      label: Protocolos de ética
+      description: Recomendaciones (anonimización, consentimiento, etc.)
+      placeholder: "Evaluar anonimización, consentimiento informado..."
+  - type: input
+    id: uso_IA
+    attributes:
+      label: Uso de IA
+      description: "sí", "no" o breve descripción
+      placeholder: "no"
+  - type: input
+    id: curva_aprendizaje
+    attributes:
+      label: Curva de aprendizaje
+      placeholder: "baja, interfaz guiada"
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas
+      description: Lista separada por comas
+      placeholder: "Mendeley, EndNote"
+  - type: textarea
+    id: notas_limitaciones
+    attributes:
+      label: Notas y limitaciones
+      placeholder: "Almacenamiento gratuito limitado..."
+  - type: input
+    id: ultima_actualizacion_aprox
+    attributes:
+      label: Última actualización (aprox.)
+      description: Año, ej. 2025
+      placeholder: "2025"

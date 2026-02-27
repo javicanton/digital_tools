@@ -1,0 +1,63 @@
+# Al mergear una PR que toque tools.csv (o en push a main), valida el CSV y el build.
+name: Tools CSV lint and build
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['data/tools.csv', 'scripts/csv-to-json.mjs']
+  push:
+    branches: [main]
+    paths: ['data/tools.csv', 'scripts/csv-to-json.mjs']
+
+jobs:
+  lint-csv:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: CSV to JSON (validación implícita)
+        run: |
+          npm ci
+          npm run import:csv -- --input ./data/tools.csv --output ./public/data/tools.json
+        env:
+          NODE_ENV: production
+
+      - name: Verificar 26 columnas
+        run: |
+          HEADER=$(head -1 data/tools.csv)
+          COUNT=$(echo "$HEADER" | tr -cd ',' | wc -c)
+          # 26 columnas = 25 comas + 1
+          if [ "$((COUNT + 1))" -ne 26 ]; then
+            echo "Error: tools.csv debe tener 26 columnas. Encontradas: $((COUNT + 1))"
+            exit 1
+          fi
+          echo "Columnas OK: 26"
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint-csv
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Build
+        run: |
+          npm ci
+          npm run import:csv -- --input ./data/tools.csv --output ./public/data/tools.json
+          npm run build
+        env:
+          NODE_ENV: production
+          GITHUB_REPOSITORY: ${{ github.repository }}

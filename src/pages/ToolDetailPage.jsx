@@ -89,19 +89,18 @@ export default function ToolDetailPage() {
         </Link>
       </p>
 
-      <div className="detail-tool-media">
-        <img
-          src={getToolImageUrl(tool)}
-          alt={`Imagen de ${tool.nombre}`}
-          referrerPolicy="no-referrer"
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            e.currentTarget.src = getPlaceholderSvg(tool.nombre);
-          }}
-        />
-      </div>
-
       <header className="detail-header">
+        <div className="detail-tool-media">
+          <img
+            src={getToolImageUrl(tool)}
+            alt={`Logo de ${tool.nombre}`}
+            referrerPolicy="no-referrer"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = getPlaceholderSvg(tool.nombre);
+            }}
+          />
+        </div>
         <div>
           <p className="tool-category">
             <Link

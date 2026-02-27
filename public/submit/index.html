@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proponer nueva herramienta - Catálogo de Herramientas</title>
+  <style>
+    :root { --bg: #f5f5f5; --card: #fff; --text: #1a1a1a; --border: #ddd; --err: #b00; --link: #0969da; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #0d1117; --card: #161b22; --text: #e6edf3; --border: #30363d; --err: #f85149; --link: #58a6ff; } }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 1rem; line-height: 1.5; }
+    .container { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--text); opacity: 0.8; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    form { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+    .field { margin-bottom: 1rem; }
+    .field label { display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.9rem; }
+    .field .hint { font-size: 0.8rem; opacity: 0.8; margin-top: 0.2rem; }
+    input[type="text"], input[type="url"], select, textarea { width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--card); color: var(--text); font: inherit; }
+    textarea { min-height: 80px; resize: vertical; }
+    .field.error input, .field.error select, .field.error textarea { border-color: var(--err); }
+    .field .error-msg { font-size: 0.8rem; color: var(--err); margin-top: 0.2rem; }
+    .row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .row .field { flex: 1; min-width: 140px; }
+    .actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    button { padding: 0.5rem 1rem; border-radius: 4px; font: inherit; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); }
+    button[type="submit"] { background: var(--link); color: #fff; border-color: var(--link); }
+    button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
+    #result { margin-top: 1rem; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--card); display: none; }
+    #result.show { display: block; }
+    #result.success { border-color: #2da44e; }
+    #result .body-preview { white-space: pre-wrap; font-size: 0.85rem; max-height: 200px; overflow-y: auto; margin: 0.75rem 0; padding: 0.5rem; background: var(--bg); border-radius: 4px; }
+    #result a { color: var(--link); }
+    .char-count { font-size: 0.8rem; opacity: 0.8; }
+    .char-count.over { color: var(--err); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Proponer nueva herramienta</h1>
+    <p class="subtitle">Los datos se enviarán como un issue en GitHub. Un flujo automático creará una PR para añadir la herramienta al catálogo. La validación definitiva se hace en el servidor.</p>
+    <form id="form" action="#" method="get">
+      <div class="field">
+        <label for="nombre">Nombre de la herramienta</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Ej: Zotero" required />
+        <div class="hint">Nombre oficial tal como aparece en la web. Se generará un identificador (slug) automáticamente.</div>
+      </div>
+      <div class="field">
+        <label for="url_oficial">URL oficial</label>
+        <input type="url" id="url_oficial" name="url_oficial" placeholder="https://www.ejemplo.org" required />
+        <div class="hint">Debe comenzar por https://</div>
+        <div class="error-msg" id="err_url"></div>
+      </div>
+      <div class="field">
+        <label for="categoria_principal">Categoría principal</label>
+        <input type="text" id="categoria_principal" name="categoria_principal" placeholder="revisión bibliográfica y gestión de referencias" required />
+      </div>
+      <div class="field">
+        <label for="etiquetas">Etiquetas</label>
+        <textarea id="etiquetas" name="etiquetas" placeholder="referencias, citas, pdf, open source" required></textarea>
+        <div class="hint">Lista separada por comas (en el CSV se guardará con |).</div>
+      </div>
+      <div class="field">
+        <label for="descripcion_corta">Descripción corta</label>
+        <textarea id="descripcion_corta" name="descripcion_corta" placeholder="Breve descripción de la herramienta..." maxlength="280" required></textarea>
+        <span class="char-count" id="desc_count">0 / 280</span>
+        <div class="error-msg" id="err_desc"></div>
+      </div>
+      <div class="field">
+        <label for="funcionalidades_clave">Funcionalidades clave</label>
+        <textarea id="funcionalidades_clave" name="funcionalidades_clave" placeholder="captura en navegador, gestión bibliografía"></textarea>
+        <div class="hint">Lista separada por comas.</div>
+      </div>
+      <div class="field">
+        <label for="utilidad_en_investigacion">Utilidad en investigación</label>
+        <textarea id="utilidad_en_investigacion" name="utilidad_en_investigacion" placeholder="Para qué sirve en un proyecto de investigación"></textarea>
+      </div>
+      <div class="field">
+        <label for="fases_investigacion">Fases de investigación</label>
+        <select id="fases_investigacion" name="fases_investigacion" multiple size="6">
+          <option value="diseño">diseño</option>
+          <option value="recogida">recogida</option>
+          <option value="limpieza">limpieza</option>
+          <option value="análisis">análisis</option>
+          <option value="visualización">visualización</option>
+          <option value="difusión">difusión</option>
+        </select>
+        <div class="hint">Solo estos valores. Mantén Ctrl/Cmd para seleccionar varios.</div>
+      </div>
+      <div class="field">
+        <label for="tipos_datos">Tipos de datos</label>
+        <select id="tipos_datos" name="tipos_datos" required>
+          <option value="">Selecciona uno</option>
+          <option value="cualitativo">cualitativo</option>
+          <option value="cuantitativo">cuantitativo</option>
+          <option value="mixto">mixto</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="precio_modelo">Precio / modelo</label>
+        <select id="precio_modelo" name="precio_modelo" required>
+          <option value="">Selecciona uno</option>
+          <option value="gratuita">gratuita</option>
+          <option value="freemium">freemium</option>
+          <option value="pago">pago</option>
+          <option value="open source">open source</option>
+          <option value="licencia académica">licencia académica</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="coste_estimado">Coste estimado</label>
+        <input type="text" id="coste_estimado" name="coste_estimado" placeholder="NA si no se conoce" />
+      </div>
+      <div class="field">
+        <label for="requisitos_sistema">Requisitos de sistema</label>
+        <input type="text" id="requisitos_sistema" name="requisitos_sistema" placeholder="Windows, macOS, Web" />
+        <div class="hint">Lista separada por comas.</div>
+      </div>
+      <div class="field">
+        <label for="integraciones">Integraciones</label>
+        <textarea id="integraciones" name="integraciones" placeholder="Word, LibreOffice, BibTeX"></textarea>
+      </div>
+      <div class="field">
+        <label for="importacion">Importación (formatos)</label>
+        <input type="text" id="importacion" name="importacion" placeholder="RIS, BibTeX, CSV" />
+      </div>
+      <div class="field">
+        <label for="exportacion">Exportación (formatos)</label>
+        <input type="text" id="exportacion" name="exportacion" placeholder="RIS, BibTeX, PDF" />
+      </div>
+      <div class="field">
+        <label for="trabajo_colaborativo">Trabajo colaborativo</label>
+        <input type="text" id="trabajo_colaborativo" name="trabajo_colaborativo" placeholder="sí, bibliotecas compartidas" />
+      </div>
+      <div class="field">
+        <label for="documentacion_tutoriales">Documentación / tutoriales</label>
+        <input type="text" id="documentacion_tutoriales" name="documentacion_tutoriales" placeholder="URL o texto" />
+      </div>
+      <div class="field">
+        <label for="idioma_interfaz">Idioma de la interfaz</label>
+        <input type="text" id="idioma_interfaz" name="idioma_interfaz" placeholder="multilingüe" />
+      </div>
+      <div class="field">
+        <label for="transparencia_datos">Transparencia de datos</label>
+        <textarea id="transparencia_datos" name="transparencia_datos" placeholder="Dónde se almacenan los datos, políticas"></textarea>
+      </div>
+      <div class="field">
+        <label for="protocolos_etica">Protocolos de ética</label>
+        <textarea id="protocolos_etica" name="protocolos_etica" placeholder="Anonimización, consentimiento informado..."></textarea>
+      </div>
+      <div class="field">
+        <label for="uso_IA">Uso de IA</label>
+        <input type="text" id="uso_IA" name="uso_IA" placeholder="no" />
+      </div>
+      <div class="field">
+        <label for="curva_aprendizaje">Curva de aprendizaje</label>
+        <input type="text" id="curva_aprendizaje" name="curva_aprendizaje" placeholder="baja, interfaz guiada" />
+      </div>
+      <div class="field">
+        <label for="alternativas">Alternativas</label>
+        <textarea id="alternativas" name="alternativas" placeholder="Mendeley, EndNote"></textarea>
+        <div class="hint">Lista separada por comas.</div>
+      </div>
+      <div class="field">
+        <label for="notas_limitaciones">Notas y limitaciones</label>
+        <textarea id="notas_limitaciones" name="notas_limitaciones" placeholder="Limitaciones conocidas"></textarea>
+      </div>
+      <div class="field">
+        <label for="ultima_actualizacion_aprox">Última actualización (aprox.)</label>
+        <input type="text" id="ultima_actualizacion_aprox" name="ultima_actualizacion_aprox" placeholder="2025" />
+      </div>
+      <div class="actions">
+        <button type="submit" id="btn_submit">Abrir issue en GitHub</button>
+        <a href="../" style="color: var(--link); align-self: center;">Volver al catálogo</a>
+      </div>
+    </form>
+    <div id="result">
+      <p id="result_msg"></p>
+      <div id="result_actions"></div>
+      <pre class="body-preview" id="body_preview"></pre>
+    </div>
+  </div>
+  <script src="submit.js"></script>
+</body>
+</html>
