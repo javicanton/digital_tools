@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SearchFilters from '../components/SearchFilters';
 import ToolCard from '../components/ToolCard';
 import { UI_TEXT } from '../i18n/es';
@@ -15,6 +15,23 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [sortBy, setSortBy] = useState('relevance');
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const s = location.state;
+    const hasFilter =
+      s &&
+      (s.selectedCategory != null || s.addTag || (Array.isArray(s.selectedTags) && s.selectedTags.length > 0));
+    if (!hasFilter) return;
+    if (s.selectedCategory != null) setSelectedCategory(s.selectedCategory);
+    if (s.addTag) {
+      setSelectedTags((prev) => (prev.includes(s.addTag) ? prev : [...prev, s.addTag]));
+    }
+    if (Array.isArray(s.selectedTags) && s.selectedTags.length) setSelectedTags(s.selectedTags);
+    navigate(location.pathname, { replace: true, state: {} });
+  }, [location.state, location.pathname, navigate]);
 
   useEffect(() => {
     let active = true;
@@ -98,7 +115,7 @@ export default function HomePage() {
       </section>
 
       <div className="catalog-layout">
-        <section className="catalog-content" aria-label="Resultados del catalogo">
+        <section className="catalog-content" aria-label="Resultados del catálogo">
           {loading && <p className="status-message">{UI_TEXT.home.loading}</p>}
           {!loading && error && <p className="status-message status-error">{UI_TEXT.home.error}</p>}
 
@@ -109,13 +126,22 @@ export default function HomePage() {
           {!loading && !error && visibleTools.length > 0 && (
             <section className="tools-grid" aria-label="Listado de herramientas">
               {visibleTools.map((tool) => (
-                <ToolCard key={tool.tool_id} tool={tool} />
+                <ToolCard
+                  key={tool.tool_id}
+                  tool={tool}
+                  onFilterByCategory={setSelectedCategory}
+                  onFilterByTag={(tag) =>
+                    setSelectedTags((prev) =>
+                      prev.includes(tag) ? prev : [...prev, tag]
+                    )
+                  }
+                />
               ))}
             </section>
           )}
         </section>
 
-        <aside className="catalog-sidebar" aria-label="Menu lateral de filtros">
+        <aside className="catalog-sidebar" aria-label="Menú lateral de filtros">
           <SearchFilters
             query={query}
             onQueryChange={setQuery}

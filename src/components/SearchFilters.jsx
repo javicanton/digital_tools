@@ -1,4 +1,6 @@
+import { useMemo, useState } from 'react';
 import { UI_TEXT } from '../i18n/es';
+import { capitalizeFirst } from '../lib/normalize';
 
 export default function SearchFilters({
   query,
@@ -13,9 +15,19 @@ export default function SearchFilters({
   onSortChange,
   availableTags,
 }) {
+  const [tagSearchQuery, setTagSearchQuery] = useState('');
+
+  const filteredTags = useMemo(() => {
+    const q = tagSearchQuery.trim().toLowerCase();
+    if (!q) return availableTags.slice(0, 12);
+    return availableTags
+      .filter((tag) => tag.toLowerCase().includes(q))
+      .slice(0, 12);
+  }, [availableTags, tagSearchQuery]);
+
   return (
     <section className="filters-panel" aria-labelledby="filters-title">
-      <h3 id="filters-title">Filtros y ordenacion</h3>
+      <h3 id="filters-title">Filtros y ordenación</h3>
 
       <form className="filters-grid" onSubmit={(event) => event.preventDefault()}>
         <div className="field-group full-width">
@@ -39,7 +51,7 @@ export default function SearchFilters({
             <option value="">{UI_TEXT.filters.categoryAll}</option>
             {categories.map((category) => (
               <option key={category} value={category}>
-                {category}
+                {capitalizeFirst(category)}
               </option>
             ))}
           </select>
@@ -55,27 +67,53 @@ export default function SearchFilters({
           </select>
         </div>
 
-        <fieldset className="field-group full-width">
+        <fieldset className="field-group full-width tag-filter-fieldset">
           <legend>{UI_TEXT.filters.tagsLabel}</legend>
-          <div className="tag-grid" role="group" aria-label={UI_TEXT.filters.tagsLabel}>
-            {availableTags.map((tag) => {
-              const checked = selectedTags.includes(tag);
-
-              return (
-                <label
-                  key={tag}
-                  className={checked ? 'tag-option tag-option--active' : 'tag-option'}
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => onToggleTag(tag)}
-                  />
-                  <span>{tag}</span>
-                </label>
-              );
-            })}
+          <div className="tag-search-row">
+            <input
+              type="search"
+              value={tagSearchQuery}
+              onChange={(event) => setTagSearchQuery(event.target.value)}
+              placeholder={UI_TEXT.filters.tagSearchPlaceholder}
+              aria-label={UI_TEXT.filters.tagSearchPlaceholder}
+              className="tag-search-input"
+            />
           </div>
+          {selectedTags.length > 0 && (
+            <div className="tag-chips" role="group" aria-label="Etiquetas activas">
+              {selectedTags.map((tag) => (
+                <span key={tag} className="tag-chip">
+                  <span className="tag-chip-label">{tag}</span>
+                  <button
+                    type="button"
+                    className="tag-chip-remove"
+                    onClick={() => onToggleTag(tag)}
+                    aria-label={`Quitar etiqueta ${tag}`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          {filteredTags.length > 0 && (
+            <div className="tag-suggestions">
+              {filteredTags.map((tag) => {
+                const isSelected = selectedTags.includes(tag);
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    className={`tag-suggestion-btn ${isSelected ? 'tag-suggestion-btn--active' : ''}`}
+                    onClick={() => onToggleTag(tag)}
+                    disabled={isSelected}
+                  >
+                    {tag}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </fieldset>
 
         <div className="field-group actions-row">

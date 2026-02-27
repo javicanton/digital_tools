@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { UI_TEXT } from '../i18n/es';
+import { capitalizeFirst } from '../lib/normalize';
 
 function getLogoFallback(officialUrl) {
   try {
@@ -16,10 +17,11 @@ function getPlaceholderSvg(label) {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-export default function ToolCard({ tool }) {
+export default function ToolCard({ tool, onFilterByCategory, onFilterByTag }) {
   const shortTags = tool.etiquetas_lista.slice(0, 3);
   const shortFeatures = tool.funcionalidades_lista.slice(0, 2);
   const imageSrc = tool.imagen_url || getLogoFallback(tool.url_oficial) || getPlaceholderSvg(tool.nombre);
+  const categoryLabel = capitalizeFirst(tool.categoria_principal);
 
   return (
     <article className="tool-card">
@@ -38,7 +40,19 @@ export default function ToolCard({ tool }) {
       </div>
 
       <header>
-        <p className="tool-category">{tool.categoria_principal}</p>
+        <p className="tool-category">
+          {onFilterByCategory ? (
+            <button
+              type="button"
+              className="tool-category-link"
+              onClick={() => onFilterByCategory(tool.categoria_principal)}
+            >
+              {categoryLabel}
+            </button>
+          ) : (
+            categoryLabel
+          )}
+        </p>
         <h3>
           <Link to={`/tool/${encodeURIComponent(tool.tool_id)}`}>{tool.nombre}</Link>
         </h3>
@@ -47,7 +61,19 @@ export default function ToolCard({ tool }) {
 
       <ul className="tag-list" aria-label="Etiquetas principales">
         {shortTags.map((tag) => (
-          <li key={tag}>{tag}</li>
+          <li key={tag}>
+            {onFilterByTag ? (
+              <button
+                type="button"
+                className="tag-link"
+                onClick={() => onFilterByTag(tag)}
+              >
+                {tag}
+              </button>
+            ) : (
+              tag
+            )}
+          </li>
         ))}
       </ul>
 

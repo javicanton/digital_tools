@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import InfoSection from '../components/InfoSection';
 import { UI_TEXT } from '../i18n/es';
 import { loadTools } from '../lib/data';
-import { formatSpanishNumber, parseSpanishNumber, splitList } from '../lib/normalize';
+import { capitalizeFirst, formatSpanishNumber, parseSpanishNumber, splitList } from '../lib/normalize';
 
 function renderList(items) {
   const parsed = splitList(items);
@@ -90,9 +90,32 @@ export default function ToolDetailPage() {
 
       <header className="detail-header">
         <div>
-          <p className="tool-category">{tool.categoria_principal}</p>
+          <p className="tool-category">
+            <Link
+              to="/"
+              state={{ selectedCategory: tool.categoria_principal }}
+              className="tool-category-link"
+            >
+              {capitalizeFirst(tool.categoria_principal)}
+            </Link>
+          </p>
           <h2>{tool.nombre}</h2>
           <p>{tool.descripcion_corta}</p>
+          {tool.etiquetas_lista?.length > 0 && (
+            <ul className="detail-tag-list" aria-label="Etiquetas">
+              {tool.etiquetas_lista.map((tag) => (
+                <li key={tag}>
+                  <Link
+                    to="/"
+                    state={{ addTag: tag }}
+                    className="tag-link"
+                  >
+                    {tag}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="detail-actions">
@@ -153,10 +176,10 @@ export default function ToolDetailPage() {
 
         <InfoSection title={UI_TEXT.detail.importExport}>
           <p>
-            <strong>Importacion:</strong> {tool.importacion || 'No especificado.'}
+            <strong>Importación:</strong> {tool.importacion || 'No especificado.'}
           </p>
           <p>
-            <strong>Exportacion:</strong> {tool.exportacion || 'No especificado.'}
+            <strong>Exportación:</strong> {tool.exportacion || 'No especificado.'}
           </p>
         </InfoSection>
 
